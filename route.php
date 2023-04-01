@@ -103,5 +103,7 @@
         else{
             echo"file daftartokoFungsi tidak ditemukan!";
         }
+    }else{
+        include "home.php";
     }
 ?>
