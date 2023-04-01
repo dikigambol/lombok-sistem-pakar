@@ -10,20 +10,6 @@ $sql_cekh = "SELECT * FROM tmp_penyakit
                         Group by id_penyakit";
 $query_cekh = mysqli_query($koneksi, $sql_cekh);
 $result_cekh = mysqli_num_rows($query_cekh);
-$get_id_penyakit = mysqli_fetch_array($query_cekh);
-
-// coba 
-$sql_petani = "SELECT * FROM tmp_petani Where noID='$noID'
-                    order by id_petani desc";
-$query_petani = mysqli_query($koneksi, $sql_petani);
-$result_petani = mysqli_fetch_array($query_petani);
-
-$valPenyakit = "";
-if ($result_cekh == 0) {
-    $valPenyakit = NULL;
-} else {
-    $valPenyakit = $get_id_penyakit['id_penyakit'];
-}
 
 if ($result_cekh == 1 || $result_cekh == 0) {
     $sql_ctr = "SELECT * from tmp_petani
@@ -33,15 +19,18 @@ if ($result_cekh == 1 || $result_cekh == 0) {
     $query_ctr = mysqli_query($koneksi, $sql_ctr);
     $result_ctr = mysqli_fetch_array($query_ctr);
     if ($result_ctr['ctr'] == 2) {
-        // insert ke tabel konsultasi atau hasil 
+        //apabila data tmp_penyakit isinya 1
+        $result_cekh = mysqli_fetch_array($query_cekh);
+        //sql petani
         $sql_petani = "SELECT * FROM tmp_petani Where noID='$noID'
                     order by id_petani desc";
         $query_petani = mysqli_query($koneksi, $sql_petani);
         $result_petani = mysqli_fetch_array($query_petani);
+        // perintah untuk memindah data   
         $sql_in = "INSERT into konsultasi set
                 nama_petani = '$result_petani[nama_petani]',
                 alamat = '$result_petani[alamat]',
-                id_penyakit = '" . $valPenyakit . "',
+                id_penyakit = '$result_cekh[id_penyakit]',
                 noID = '$result_petani[noID]'";
         mysqli_query($koneksi, $sql_in);
 
@@ -76,17 +65,21 @@ if ($resultcek >= 1) {
     $id_gejala = $resultg['id_gejala'];
     $gejala = $resultg['nama_gejala'];
 } else {
-    // insert ke tabel konsultasi atau hasil 
+    //apabila data tmp_penyakit isinya 1
+    $result_cekh = mysqli_fetch_array($query_cekh);
+    //sql petani
     $sql_petani = "SELECT * FROM tmp_petani Where noID='$noID'
-    order by id_petani desc";
+                    order by id_petani desc";
     $query_petani = mysqli_query($koneksi, $sql_petani);
     $result_petani = mysqli_fetch_array($query_petani);
+    // perintah untuk memindah data   
     $sql_in = "INSERT into konsultasi set
                 nama_petani = '$result_petani[nama_petani]',
                 alamat = '$result_petani[alamat]',
-                id_penyakit = '" . $valPenyakit . "',
+                id_penyakit = '$result_cekh[id_penyakit]',
                 noID = '$result_petani[noID]'";
     mysqli_query($koneksi, $sql_in);
+    
     function Deltmpcf($noID)
     {
         include "koneksi.php";

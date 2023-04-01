@@ -114,7 +114,6 @@
     }
     if ($rbPilih == "tidak"){
         DelTmpAnalisa($noID);
-        DelTmpPenyakit($noID);
         $sql_petani = "SELECT * from tmp_petani 
                             where noID='$noID'
                             order by id_petani desc
