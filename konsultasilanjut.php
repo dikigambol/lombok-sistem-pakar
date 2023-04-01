@@ -5,9 +5,7 @@ $noID = $_SERVER['REMOTE_ADDR'];
 
 //cek solusi pada tmp
 //sql h
-$sql_cekh = "SELECT * FROM tmp_penyakit 
-                        WHERE noID='$noID'
-                        Group by id_penyakit";
+$sql_cekh = "SELECT * FROM tmp_penyakit WHERE noID='$noID'";
 $query_cekh = mysqli_query($koneksi, $sql_cekh);
 $result_cekh = mysqli_num_rows($query_cekh);
 

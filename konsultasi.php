@@ -5,14 +5,12 @@ $noID = $_SERVER['REMOTE_ADDR'];
 
 # periksa apabila sudah ditemukan
 //periksa data penyakit di dalam tmp
-$sql_cekh = "SELECT * FROM tmp_penyakit 
-                        WHERE noID='$noID'
-                        Group by id_penyakit";
+$sql_cekh = "SELECT * FROM tmp_penyakit WHERE noID='$noID'";
 $query_cekh = mysqli_query($koneksi, $sql_cekh);
 $result_cekh = mysqli_num_rows($query_cekh);
 if ($result_cekh == 1) {
     //apabila data tmp_penyakit isinya 1
-    $result_cekh = mysqli_fetch_array($query_cekh);
+    $result_cek = mysqli_fetch_array($query_cekh);
     //sql petani
     $sql_petani = "SELECT * FROM tmp_petani Where noID='$noID'
                     order by id_petani desc";
@@ -22,10 +20,10 @@ if ($result_cekh == 1) {
     $sql_in = "INSERT into konsultasi set
                 nama_petani = '$result_petani[nama_petani]',
                 alamat = '$result_petani[alamat]',
-                id_penyakit = '$result_cekh[id_penyakit]',
+                id_penyakit = '$result_cek[id_penyakit]',
                 noID = '$result_petani[noID]'";
     mysqli_query($koneksi, $sql_in);
-
+    
     //redireksi setelah pemindahan data
     echo "<meta http-equiv='refresh' content='0; url=index.php?page=konsultasilanjut'>";
     exit;
