@@ -3,20 +3,33 @@ include "koneksi.php";
 
 $noID = $_SERVER['REMOTE_ADDR'];
 
-//cek solusi pada tmp
-//sql h
-$sql_cekh = "SELECT * FROM tmp_penyakit WHERE noID='$noID'";
-$query_cekh = mysqli_query($koneksi, $sql_cekh);
-$result_cekh = mysqli_num_rows($query_cekh);
+$sqlcek = "SELECT id_gejala from tmp_analisa
+                WHERE id_gejala NOT IN (SELECT id_gejala from tmp_cf)
+                and noID = '$noID'";
+$querycek = mysqli_query($koneksi, $sqlcek);
+$resultcek = mysqli_num_rows($querycek);
 
-if ($result_cekh == 1 || $result_cekh == 0) {
-    $sql_ctr = "SELECT * from tmp_petani
-                            Where noID = '$noID'
-                            order by id_petani desc
-                            limit 1";
-    $query_ctr = mysqli_query($koneksi, $sql_ctr);
-    $result_ctr = mysqli_fetch_array($query_ctr);
-    if ($result_ctr['ctr'] == 2) {
+if ($resultcek >= 1) {
+    //sql pertanyaan gejala (untuk pertanyaan selajutnya)
+    $sqlg = "SELECT gejala.* from gejala, tmp_analisa, tmp_cf
+                    where gejala.id_gejala = tmp_analisa.id_gejala
+                    and tmp_analisa.noID = '$noID'
+                    and not tmp_analisa.id_gejala
+                        in(select id_gejala 
+                        from tmp_cf where noID='$noID')
+                    order by gejala.id_gejala asc";
+    $queryg = mysqli_query($koneksi, $sqlg);
+    $resultg = mysqli_fetch_array($queryg);
+    $id_gejala = $resultg['id_gejala'];
+    $gejala = $resultg['nama_gejala'];
+} else {
+    //cek solusi pada tmp
+    //sql h
+    $sql_cekh = "SELECT * FROM tmp_penyakit WHERE noID='$noID'";
+    $query_cekh = mysqli_query($koneksi, $sql_cekh);
+    $result_cekh = mysqli_num_rows($query_cekh);
+
+    if ($result_cekh == 1) {
         //apabila data tmp_penyakit isinya 1
         $result_cekh = mysqli_fetch_array($query_cekh);
         //sql petani
@@ -32,61 +45,57 @@ if ($result_cekh == 1 || $result_cekh == 0) {
                 noID = '$result_petani[noID]'";
         mysqli_query($koneksi, $sql_in);
 
-        function Deltmpcf($noID)
-        {
-            include "koneksi.php";
-            $sql_delcf = "DELETE from tmp_cf where noID='$noID'";
-            mysqli_query($koneksi, $sql_delcf);
-        }
+        $sql_analisa = "DELETE from tmp_analisa where noID='$noID'";
+        mysqli_query($koneksi, $sql_analisa);
+
+        $sql_delcf = "DELETE from tmp_cf where noID='$noID'";
+        mysqli_query($koneksi, $sql_delcf);
+
+        $sql_gejala = "DELETE from tmp_gejala where noID='$noID'";
+        mysqli_query($koneksi, $sql_gejala);
+
+        $sql_penyakit = "DELETE from tmp_penyakit where noID='$noID'";
+        mysqli_query($koneksi, $sql_penyakit);
+
+        $sql_petani = "DELETE from tmp_petani where noID='$noID'";
+        mysqli_query($koneksi, $sql_petani);
+
+        //redirect setelah insert data
+        echo "<meta http-equiv='refresh' content='0; url=index.php?page=hasil'>";
+        exit;
+    } else {
+        //sql petani
+        $sql_petani = "SELECT * FROM tmp_petani Where noID='$noID'
+                    order by id_petani desc";
+        $query_petani = mysqli_query($koneksi, $sql_petani);
+        $result_petani = mysqli_fetch_array($query_petani);
+        // perintah untuk memindah data   
+        $sql_in = "INSERT into konsultasi set
+                nama_petani = '$result_petani[nama_petani]',
+                alamat = '$result_petani[alamat]',
+                id_penyakit = '',
+                noID = '$result_petani[noID]'";
+        mysqli_query($koneksi, $sql_in);
+
+        $sql_analisa = "DELETE from tmp_analisa where noID='$noID'";
+        mysqli_query($koneksi, $sql_analisa);
+
+        $sql_delcf = "DELETE from tmp_cf where noID='$noID'";
+        mysqli_query($koneksi, $sql_delcf);
+
+        $sql_gejala = "DELETE from tmp_gejala where noID='$noID'";
+        mysqli_query($koneksi, $sql_gejala);
+
+        $sql_penyakit = "DELETE from tmp_penyakit where noID='$noID'";
+        mysqli_query($koneksi, $sql_penyakit);
+
+        $sql_petani = "DELETE from tmp_petani where noID='$noID'";
+        mysqli_query($koneksi, $sql_petani);
+
         //redirect setelah insert data
         echo "<meta http-equiv='refresh' content='0; url=index.php?page=hasil'>";
         exit;
     }
-}
-
-$sqlcek = "SELECT id_gejala from tmp_analisa
-                WHERE id_gejala NOT IN (SELECT id_gejala from tmp_cf)
-                and noID = '$noID'";
-$querycek = mysqli_query($koneksi, $sqlcek);
-$resultcek = mysqli_num_rows($querycek);
-if ($resultcek >= 1) {
-    //sql pertanyaan gejala (untuk pertanyaan selajutnya)
-    $sqlg = "SELECT gejala.* from gejala, tmp_analisa, tmp_cf
-                    where gejala.id_gejala = tmp_analisa.id_gejala
-                    and tmp_analisa.noID = '$noID'
-                    and not tmp_analisa.id_gejala
-                        in(select id_gejala 
-                        from tmp_cf where noID='$noID')
-                    order by gejala.id_gejala asc";
-    $queryg = mysqli_query($koneksi, $sqlg);
-    $resultg = mysqli_fetch_array($queryg);
-    $id_gejala = $resultg['id_gejala'];
-    $gejala = $resultg['nama_gejala'];
-} else {
-    //apabila data tmp_penyakit isinya 1
-    $result_cekh = mysqli_fetch_array($query_cekh);
-    //sql petani
-    $sql_petani = "SELECT * FROM tmp_petani Where noID='$noID'
-                    order by id_petani desc";
-    $query_petani = mysqli_query($koneksi, $sql_petani);
-    $result_petani = mysqli_fetch_array($query_petani);
-    // perintah untuk memindah data   
-    $sql_in = "INSERT into konsultasi set
-                nama_petani = '$result_petani[nama_petani]',
-                alamat = '$result_petani[alamat]',
-                id_penyakit = '$result_cekh[id_penyakit]',
-                noID = '$result_petani[noID]'";
-    mysqli_query($koneksi, $sql_in);
-    
-    function Deltmpcf($noID)
-    {
-        include "koneksi.php";
-        $sql_delcf = "DELETE from tmp_cf where noID='$noID'";
-        mysqli_query($koneksi, $sql_delcf);
-    }
-    //redirect setelah insert data
-    echo "<meta http-equiv='refresh' content='0; url=index.php?page=hasil'>";
-    exit;
 }
 ?>
 

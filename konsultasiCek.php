@@ -128,7 +128,7 @@ if ($rbPilih == "ya") {
         AddTmpGejala($txtIdGejala, $noID);
         AddcfYGejala($txtIdGejala, $noID);
     } //redireksi
-    echo "<meta http-equiv='refresh' content='0; url=index.php?page=konsultasi'>";
+    echo "<meta http-equiv='refresh' content='0; url=index.php?page=konsultasilanjut'>";
 }
 
 //apabila tidak
@@ -176,12 +176,21 @@ if ($rbPilih == "tidak") {
                         noID = '$result_petani[noID]'";
             mysqli_query($koneksi, $sql_in);
 
-            function Deltmpcf($noID)
-            {
-                include "koneksi.php";
-                $sql_delcf = "DELETE from tmp_cf where noID='$noID'";
-                mysqli_query($koneksi, $sql_delcf);
-            }
+            $sql_analisa = "DELETE from tmp_analisa where noID='$noID'";
+            mysqli_query($koneksi, $sql_analisa);
+
+            $sql_delcf = "DELETE from tmp_cf where noID='$noID'";
+            mysqli_query($koneksi, $sql_delcf);
+
+            $sql_gejala = "DELETE from tmp_gejala where noID='$noID'";
+            mysqli_query($koneksi, $sql_gejala);
+
+            $sql_penyakit = "DELETE from tmp_penyakit where noID='$noID'";
+            mysqli_query($koneksi, $sql_penyakit);
+
+            $sql_petani = "DELETE from tmp_petani where noID='$noID'";
+            mysqli_query($koneksi, $sql_petani);
+
             //redirect setelah insert data
             echo "<meta http-equiv='refresh' content='0; url=index.php?page=hasil'>";
             exit;
